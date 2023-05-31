@@ -1,0 +1,31 @@
+version: '3.7'
+
+networks:
+  network_arqui:
+    name: 'network_arqui'
+
+services:
+  postgresql:
+    container_name: service_postgres
+    image: 'bitnami/postgresql:14'
+    networks:
+      - network_arqui
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_DATABASE=proyect
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_PASSWORD=2023
+  server:
+    build:
+      context: ./crud
+      dockerfile: ./Dockerfile
+    networks:
+      - network_arqui
+    depends_on:
+      - postgresql
+    ports:
+      - "3000:3000"
+    environment:
+      - SERVER_HOST=server
